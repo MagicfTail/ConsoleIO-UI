@@ -156,45 +156,40 @@ public abstract class ConsoleUI
         {
             Console.SetCursorPosition(0, 0);
 
-            StringBuilder interfaceBuffer = new();
+            MessagesBodyBuilder bodyBuilder = new(ConsoleHeight, ConsoleWidth);
 
-            interfaceBuffer.Append(InterfaceHelpers.TopLine(ConsoleWidth));
-
-            // #TODO: Fix messages that don't fit on 1 line
             lock (messageLock)
             {
-                string overflow = "";
-                int overflowOffset = 0;
-
-                for (var i = ConsoleHeight - 2; i > 0; i--)
+                // Keep adding messages until we run out or the screen is filled
+                for (int i = messages.Count; i > 0; i--)
                 {
-                    if (messages.Count - i + overflowOffset < 0)
-                    {
-                        interfaceBuffer.AppendLine(InterfaceHelpers.ClearLine(ConsoleWidth));
-                        continue;
-                    }
+                    bodyBuilder.AppendMessage(messages[i - 1]);
 
-                    string message = messages[^(i + overflowOffset)];
-
-                    if (overflow == "")
+                    if (bodyBuilder.IsFull())
                     {
-                        overflow = message;
-                    }
-
-                    if (overflow.Length <= ConsoleWidth)
-                    {
-                        interfaceBuffer.Append(InterfaceHelpers.EncapsulateAndPadRight(overflow, ConsoleWidth));
-                        overflow = "";
-                    }
-                    else
-                    {
-                        int overhangLength = overflow.Length % ConsoleWidth == 0 ? ConsoleWidth : overflow.Length % ConsoleWidth;
-                        interfaceBuffer.Append(InterfaceHelpers.EncapsulateAndPadRight(overflow[^overhangLength..], ConsoleWidth));
-                        overflow = overflow[..^overhangLength];
-                        overflowOffset++;
+                        break;
                     }
                 }
             }
+
+            StringBuilder interfaceBuffer = new();
+
+            // Add top
+            interfaceBuffer.Append(InterfaceHelpers.TopLine(ConsoleWidth));
+
+            // If there aren't enough messages to fill the screen, add whitespace
+            int missingLines = ConsoleHeight - bodyBuilder.lines - 2;
+
+            if (missingLines > 0)
+            {
+                foreach (int i in Enumerable.Range(0, missingLines))
+                {
+                    interfaceBuffer.AppendLine(InterfaceHelpers.ClearLine(ConsoleWidth));
+                }
+            }
+
+            // Add the messages
+            interfaceBuffer.Append(bodyBuilder.Build());
 
             interfaceBuffer.AppendLine(InterfaceHelpers.SeparateLine(ConsoleWidth, ScrolledRight, ScrolledLeft));
 
@@ -259,5 +254,85 @@ public abstract class ConsoleUI
     {
         Console.Write(InterfaceHelpers.AltBufferString);
         Console.Clear();
+    }
+
+    private class MessagesBodyBuilder
+    {
+        private readonly StringBuilder builder = new();
+        private readonly Stack<string> buffer = new();
+
+        public int lines = 0;
+
+        private readonly int usableHeight;
+        private readonly int usableWidth;
+
+        public MessagesBodyBuilder(int consoleHeight, int consoleWidth)
+        {
+            usableHeight = consoleHeight - 2;
+            usableWidth = consoleWidth;
+        }
+
+        public void AppendMessage(string message)
+        {
+            lines += LinesUsed(message);
+            buffer.Push(message);
+        }
+
+        public bool IsFull()
+        {
+            return lines >= usableHeight;
+        }
+
+        public StringBuilder Build()
+        {
+            int excessLines = lines - usableHeight;
+
+            // The first message drawn might have to be cut off
+            if (excessLines > 0)
+            {
+                string message = buffer.Pop();
+
+                // Draw the first n-1 lines of the cut off message
+                for (int i = excessLines; i < LinesUsed(message) - 1; i++)
+                {
+                    builder.AppendLine(InterfaceHelpers.Encapsulate(
+                        message[(usableWidth * i)..(usableWidth * (i + 1))]));
+                }
+
+                // Draw the last part
+                int overhangLength = message.Length % usableWidth == 0 ? usableWidth : message.Length % usableWidth;
+
+                builder.AppendLine(InterfaceHelpers.EncapsulateAndPadRight(
+                    message[^overhangLength..], usableWidth));
+            }
+
+            while (buffer.Count > 0)
+            {
+                string message = buffer.Pop();
+
+                // Draw the remaining messages normally, over multiple lines
+                int loop = 0;
+                while (true)
+                {
+                    if ((loop + 1) * usableWidth >= message.Length)
+                    {
+                        builder.AppendLine(InterfaceHelpers.EncapsulateAndPadRight(
+                            message[(loop * usableWidth)..], usableWidth));
+                        break;
+                    }
+
+                    builder.AppendLine(InterfaceHelpers.Encapsulate(
+                        message[(loop * usableWidth)..((loop + 1) * usableWidth)]));
+                    loop++;
+                }
+            }
+
+            return builder;
+        }
+
+        private int LinesUsed(string message)
+        {
+            return Math.Max(1, (int)Math.Ceiling((double)message.Length / usableWidth));
+        }
     }
 }
