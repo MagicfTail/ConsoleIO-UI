@@ -28,6 +28,10 @@ public abstract class ConsoleUI
 
     public ConsoleUI() { }
 
+    public abstract void UserInputHandler(string input);
+
+    public abstract void ExitHandler();
+
     public void Start()
     {
         Console.OutputEncoding = Encoding.UTF8;
@@ -40,10 +44,6 @@ public abstract class ConsoleUI
 
         readerThread.Join();
     }
-
-    public abstract void UserInputHandler(string input);
-
-    public abstract void ExitHandler();
 
     public void Stop()
     {
