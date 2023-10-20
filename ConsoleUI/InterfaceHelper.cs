@@ -4,17 +4,19 @@ namespace ConsoleUI;
 
 public static class InterfaceHelpers
 {
-    public const char rightBorder = '│';
-    public const char leftBorder = '│';
-    public const char topLeft = '┌';
-    public const char bottomLeft = '└';
-    public const char topRight = '┐';
-    public const char bottomRight = '┘';
-    public const char leftT = '├';
-    public const char rightT = '┤';
-    public const char horizontalSeparator = '─';
-    public const char RightArrow = '⮞';
-    public const char LeftArrow = '⮜';
+    private const char rightBorder = '│';
+    private const char leftBorder = '│';
+    private const char topLeft = '┌';
+    private const char bottomLeft = '└';
+    private const char topRight = '┐';
+    private const char bottomRight = '┘';
+    private const char leftT = '┝';
+    private const char rightT = '┥';
+    private const char horizontalBorder = '─';
+    private const char horizontalSeparator = '━';
+    private const char wavySeparator = '╍';
+    private const char RightArrow = '⮞';
+    private const char LeftArrow = '⮜';
     public const string MainBufferString = "\x1b[?1049l";
     public const string AltBufferString = "\x1b[?1049h";
 
@@ -23,29 +25,30 @@ public static class InterfaceHelpers
         return new StringBuilder().Append(leftBorder).Append(input).Append(rightBorder).ToString();
     }
 
-    public static string EncapsulateAndPadRight(string input, int ConsoleWidth)
+    public static string EncapsulateAndPadRight(string input, int consoleWidth)
     {
-        return Encapsulate(input.PadRight(ConsoleWidth));
+        return Encapsulate(input.PadRight(consoleWidth));
     }
 
-    public static string ClearLine(int ConsoleWidth)
+    public static string ClearLine(int consoleWidth)
     {
-        return new StringBuilder().Append(leftBorder).Append(new string(' ', ConsoleWidth)).Append(rightBorder).ToString();
+        return new StringBuilder().Append(leftBorder).Append(new string(' ', consoleWidth)).Append(rightBorder).ToString();
     }
 
-    public static string SeparateLine(int ConsoleWidth, bool ScrolledRight, bool ScrolledLeft)
+    public static string SeparateLine(int consoleWidth, bool scrolledRight, bool scrolledLeft, bool scrolledUp)
     {
-        return new StringBuilder().Append(ScrolledRight ? LeftArrow : leftT).Append(new string(horizontalSeparator, ConsoleWidth)).Append(ScrolledLeft ? RightArrow : rightT).ToString();
+        return new StringBuilder().Append(scrolledRight ? LeftArrow : leftT).Append(
+            new string(scrolledUp ? wavySeparator : horizontalSeparator, consoleWidth)).Append(scrolledLeft ? RightArrow : rightT).ToString();
     }
 
-    public static string TopLine(int ConsoleWidth)
+    public static string TopLine(int consoleWidth)
     {
-        return new StringBuilder().Append(topLeft).Append(new string(horizontalSeparator, ConsoleWidth)).Append(topRight).ToString();
+        return new StringBuilder().Append(topLeft).Append(new string(horizontalBorder, consoleWidth)).Append(topRight).ToString();
     }
 
-    public static string BottomLine(int ConsoleWidth)
+    public static string BottomLine(int consoleWidth)
     {
-        return new StringBuilder().Append(bottomLeft).Append(new string(horizontalSeparator, ConsoleWidth)).Append(bottomRight).ToString();
+        return new StringBuilder().Append(bottomLeft).Append(new string(horizontalBorder, consoleWidth)).Append(bottomRight).ToString();
     }
 }
 

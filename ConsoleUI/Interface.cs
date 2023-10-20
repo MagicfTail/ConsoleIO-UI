@@ -14,6 +14,7 @@ public abstract class ConsoleUI
 
     private bool ScrolledRight => windowOffset > 0;
     private bool ScrolledLeft => windowOffset + ConsoleWidth < inputBuffer.Length;
+    private bool ScrolledUp => messageOffset > 0;
 
     private string inputBuffer = "";
     private int cursorPosition = 0;
@@ -29,6 +30,7 @@ public abstract class ConsoleUI
 
     public void Start()
     {
+        Console.OutputEncoding = Encoding.UTF8;
         Thread readerThread = new(ReadWorker);
 
         GotoAlternateBuffer();
@@ -243,7 +245,7 @@ public abstract class ConsoleUI
             interfaceBuffer.Append(bodyBuilder.Build());
 
             // Add separator
-            interfaceBuffer.AppendLine(InterfaceHelpers.SeparateLine(ConsoleWidth, ScrolledRight, ScrolledLeft));
+            interfaceBuffer.AppendLine(InterfaceHelpers.SeparateLine(ConsoleWidth, ScrolledRight, ScrolledLeft, ScrolledUp));
 
             // Add current user input
             if (inputBuffer.Length <= ConsoleWidth)
