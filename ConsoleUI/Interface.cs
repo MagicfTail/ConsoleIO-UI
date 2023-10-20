@@ -47,6 +47,7 @@ public abstract class ConsoleUI
     {
         GotoMainBuffer();
         exit = true;
+        ExitHandler();
     }
 
     private void ReadWorker()
@@ -194,7 +195,6 @@ public abstract class ConsoleUI
                 break;
             case ConsoleKey.Escape:
                 Stop();
-
                 return;
         }
 
