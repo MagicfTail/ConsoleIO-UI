@@ -300,6 +300,11 @@ public abstract class ConsoleUI
         {
             windowOffset = 0;
         }
+        else if (ConsoleWidth + windowOffset > inputBuffer.Length)
+        {
+            windowOffset += inputBuffer.Length - (ConsoleWidth + windowOffset);
+            cursorPosition = ConsoleWidth;
+        }
 
         if (cursorPosition > ConsoleWidth)
         {
