@@ -7,25 +7,25 @@ public abstract class ConsoleUI
     private readonly List<string> messages = new();
     private readonly List<string?> senders = new();
 
+    readonly object drawLock = new();
+    readonly object messageLock = new();
+    readonly object consoleSizeLock = new();
+
     private int fullWidth = Console.BufferWidth;
     private int fullHeight = Console.BufferHeight;
     private int ConsoleWidth => fullWidth - 2;
     private int ConsoleHeight => fullHeight - 2;
-
-    private bool ScrolledRight => windowOffset > 0;
-    private bool ScrolledLeft => windowOffset + ConsoleWidth < inputBuffer.Length;
-    private bool ScrolledUp => messageOffset > 0;
 
     private string inputBuffer = "";
     private int cursorPosition = 0;
     private int windowOffset = 0;
     private int messageOffset = 0;
 
-    readonly object drawLock = new();
-    readonly object messageLock = new();
-    readonly object consoleSizeLock = new();
+    private bool exit = false;
 
-    public bool exit = false;
+    private bool ScrolledRight => windowOffset > 0;
+    private bool ScrolledLeft => windowOffset + ConsoleWidth < inputBuffer.Length;
+    private bool ScrolledUp => messageOffset > 0;
 
     public ConsoleUI() { }
 
