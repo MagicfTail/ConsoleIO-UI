@@ -4,8 +4,7 @@ namespace ConsoleUI;
 
 public abstract class ConsoleUI
 {
-    private readonly List<string> messages = new();
-    private readonly List<string?> senders = new();
+    private readonly List<Message> messages = new();
 
     readonly object drawLock = new();
     readonly object messageLock = new();
@@ -225,7 +224,7 @@ public abstract class ConsoleUI
                     // Keep adding messages until we run out or the screen is filled
                     for (int i = messages.Count - messageOffset; i > 0; i--)
                     {
-                        bodyBuilder.AppendMessage(messages[i - 1]);
+                        bodyBuilder.AppendMessage(messages[i - 1].Body);
 
                         if (bodyBuilder.IsFull())
                         {
@@ -275,12 +274,11 @@ public abstract class ConsoleUI
         }
     }
 
-    public void AddMessage(string message, string? sender)
+    public void AddMessage(string body, string? sender)
     {
         lock (messageLock)
         {
-            messages.Add(message);
-            senders.Add(sender);
+            messages.Add(new Message(body, sender));
 
             if (messageOffset != 0)
             {
@@ -330,5 +328,17 @@ public abstract class ConsoleUI
     {
         Console.Write(InterfaceHelpers.AltBufferString);
         Console.Clear();
+    }
+
+    private class Message
+    {
+        public string Body { get; set; }
+        public string? Sender { get; set; }
+        public Message(string body, string? sender)
+        {
+            Body = body;
+            Sender = sender;
+        }
+
     }
 }
