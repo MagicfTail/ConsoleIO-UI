@@ -329,16 +329,4 @@ public abstract class ConsoleUI
         Console.Write(InterfaceHelpers.AltBufferString);
         Console.Clear();
     }
-
-    private class Message
-    {
-        public string Body { get; set; }
-        public string? Sender { get; set; }
-        public Message(string body, string? sender)
-        {
-            Body = body;
-            Sender = sender;
-        }
-
-    }
 }
