@@ -70,81 +70,81 @@ public abstract class ConsoleUI
                 // Move the window along if typing at the end of the input
                 windowOffset++;
             }
-        }
-        else if (keyInfo.Key == ConsoleKey.Enter)
-        {
-            UserInputHandler(inputBuffer);
-            ResetInput();
-        }
-        else if (keyInfo.Key == ConsoleKey.LeftArrow)
-        {
-            if (cursorPosition + windowOffset == 0)
-            {
-                Console.Beep();
-            }
-            else if (cursorPosition == 0 && ScrolledRight)
-            {
-                windowOffset--;
-            }
-            else
-            {
-                cursorPosition--;
-            }
-        }
-        else if (keyInfo.Key == ConsoleKey.RightArrow)
-        {
-            if (cursorPosition + windowOffset == inputBuffer.Length)
-            {
-                Console.Beep();
-            }
-            else if (cursorPosition == ConsoleWidth)
-            {
-                windowOffset++;
-            }
-            else
-            {
-                cursorPosition++;
-            }
-        }
-        else if (keyInfo.Key == ConsoleKey.Backspace)
-        {
-            if (cursorPosition + windowOffset == 0)
-            {
-                Console.Beep();
-            }
-            else if (ScrolledRight && windowOffset + ConsoleWidth >= inputBuffer.Length)
-            {
-                inputBuffer = inputBuffer.Remove(cursorPosition + windowOffset - 1, 1);
-                windowOffset--;
-            }
-            else
-            {
-                inputBuffer = inputBuffer.Remove(cursorPosition + windowOffset - 1, 1);
-                cursorPosition--;
-            }
-        }
-        else if (keyInfo.Key == ConsoleKey.Delete)
-        {
-            if (cursorPosition + windowOffset == inputBuffer.Length)
-            {
-                Console.Beep();
-            }
-            else if (ScrolledRight && windowOffset + ConsoleWidth >= inputBuffer.Length)
-            {
-                inputBuffer = inputBuffer.Remove(cursorPosition + windowOffset, 1);
-                windowOffset--;
-            }
-            else
-            {
-                inputBuffer = inputBuffer.Remove(cursorPosition + windowOffset, 1);
-            }
-        }
-        else if (keyInfo.Key == ConsoleKey.Escape)
-        {
-            GotoMainBuffer();
-            exit = true;
 
+            DrawInterface();
             return;
+        }
+
+        switch (keyInfo.Key)
+        {
+            case ConsoleKey.Enter:
+                UserInputHandler(inputBuffer);
+                ResetInput();
+                break;
+            case ConsoleKey.LeftArrow:
+                if (cursorPosition + windowOffset == 0)
+                {
+                    Console.Beep();
+                }
+                else if (cursorPosition == 0 && ScrolledRight)
+                {
+                    windowOffset--;
+                }
+                else
+                {
+                    cursorPosition--;
+                }
+                break;
+            case ConsoleKey.RightArrow:
+                if (cursorPosition + windowOffset == inputBuffer.Length)
+                {
+                    Console.Beep();
+                }
+                else if (cursorPosition == ConsoleWidth)
+                {
+                    windowOffset++;
+                }
+                else
+                {
+                    cursorPosition++;
+                }
+                break;
+            case ConsoleKey.Backspace:
+                if (cursorPosition + windowOffset == 0)
+                {
+                    Console.Beep();
+                }
+                else if (ScrolledRight && windowOffset + ConsoleWidth >= inputBuffer.Length)
+                {
+                    inputBuffer = inputBuffer.Remove(cursorPosition + windowOffset - 1, 1);
+                    windowOffset--;
+                }
+                else
+                {
+                    inputBuffer = inputBuffer.Remove(cursorPosition + windowOffset - 1, 1);
+                    cursorPosition--;
+                }
+                break;
+            case ConsoleKey.Delete:
+                if (cursorPosition + windowOffset == inputBuffer.Length)
+                {
+                    Console.Beep();
+                }
+                else if (ScrolledRight && windowOffset + ConsoleWidth >= inputBuffer.Length)
+                {
+                    inputBuffer = inputBuffer.Remove(cursorPosition + windowOffset, 1);
+                    windowOffset--;
+                }
+                else
+                {
+                    inputBuffer = inputBuffer.Remove(cursorPosition + windowOffset, 1);
+                }
+                break;
+            case ConsoleKey.Escape:
+                GotoMainBuffer();
+                exit = true;
+
+                return;
         }
 
         DrawInterface();
@@ -191,8 +191,10 @@ public abstract class ConsoleUI
             // Add the messages
             interfaceBuffer.Append(bodyBuilder.Build());
 
+            // Add separator
             interfaceBuffer.AppendLine(InterfaceHelpers.SeparateLine(ConsoleWidth, ScrolledRight, ScrolledLeft));
 
+            // Add current user input
             if (inputBuffer.Length <= ConsoleWidth)
             {
                 interfaceBuffer.Append(InterfaceHelpers.EncapsulateAndPadRight(inputBuffer, ConsoleWidth));
@@ -202,6 +204,7 @@ public abstract class ConsoleUI
                 interfaceBuffer.Append(InterfaceHelpers.Encapsulate(inputBuffer.Substring(windowOffset, ConsoleWidth)));
             }
 
+            // Add bottom line
             interfaceBuffer.Append(InterfaceHelpers.BottomLine(ConsoleWidth));
 
             Console.Write(interfaceBuffer);
