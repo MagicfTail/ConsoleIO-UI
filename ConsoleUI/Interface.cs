@@ -76,7 +76,7 @@ public abstract class ConsoleUI
                 RefreshConsoleSize();
                 if (cursorPosition < ConsoleWidth)
                 {
-                    // Move thr cursor along if when typing normally
+                    // Move thr cursor along when typing normally
                     cursorPosition++;
                 }
                 else
