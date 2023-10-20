@@ -2,34 +2,37 @@
 {
     static void Main()
     {
-        Program program = new();
+        Program program = new(15);
+        program.thread.Start();
 
         program.Start();
+
+        program.thread.Join();
     }
 
     private class Program : ConsoleUI.ConsoleUI
     {
         bool exitSignal = false;
 
-        public Program() : base()
+        public Thread thread;
+
+        public Program(int senderWidth = 0) : base(senderWidth)
         {
-            Thread thread = new(() =>
+            thread = new(() =>
             {
                 int i = 1;
                 while (!exitSignal)
                 {
-                    AddMessage($"Message {i}", null);
+                    AddMessage($"Message {i}", "Important Process");
                     i++;
                     Thread.Sleep(1000);
                 }
             });
-
-            thread.Start();
         }
 
         public override void UserInputHandler(string input)
         {
-            AddMessage(input, null);
+            AddMessage(input, "Me :)");
         }
 
         public override void ExitHandler()

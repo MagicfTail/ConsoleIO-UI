@@ -10,10 +10,16 @@ public abstract class ConsoleUI
     readonly object messageLock = new();
     readonly object consoleSizeLock = new();
 
+    private readonly InterfaceHelpers _helper;
+    private readonly int _senderWidth;
+
     private int fullWidth = Console.BufferWidth;
     private int fullHeight = Console.BufferHeight;
     private int ConsoleWidth => fullWidth - 2;
     private int ConsoleHeight => fullHeight - 2;
+    private int UsableWidth => ConsoleWidth - SenderAreaWidth;
+    private int UsableHeight => ConsoleHeight - 2;
+    private int SenderAreaWidth => _senderWidth + 1;
 
     private string inputBuffer = "";
     private int cursorPosition = 0;
@@ -26,7 +32,11 @@ public abstract class ConsoleUI
     private bool ScrolledLeft => windowOffset + ConsoleWidth < inputBuffer.Length;
     private bool ScrolledUp => messageOffset > 0;
 
-    public ConsoleUI() { }
+    public ConsoleUI(int senderWidth = 0)
+    {
+        _senderWidth = senderWidth > 0 ? senderWidth : 0;
+        _helper = new(SenderAreaWidth);
+    }
 
     public abstract void UserInputHandler(string input);
 
@@ -217,14 +227,14 @@ public abstract class ConsoleUI
             {
                 Console.SetCursorPosition(0, 0);
 
-                MessagesBodyBuilder bodyBuilder = new(ConsoleHeight, ConsoleWidth);
+                MessagesBodyBuilder bodyBuilder = new(UsableWidth, UsableHeight, _helper);
 
                 lock (messageLock)
                 {
                     // Keep adding messages until we run out or the screen is filled
                     for (int i = messages.Count - messageOffset; i > 0; i--)
                     {
-                        bodyBuilder.AppendMessage(messages[i - 1].Body);
+                        bodyBuilder.AppendMessage(messages[i - 1]);
 
                         if (bodyBuilder.IsFull())
                         {
@@ -236,16 +246,16 @@ public abstract class ConsoleUI
                 StringBuilder interfaceBuffer = new();
 
                 // Add top
-                interfaceBuffer.Append(InterfaceHelpers.TopLine(ConsoleWidth));
+                interfaceBuffer.Append(_helper.TopLine(ConsoleWidth));
 
                 // If there aren't enough messages to fill the screen, add whitespace
-                int missingLines = ConsoleHeight - bodyBuilder.lines - 2;
+                int missingLines = UsableHeight - bodyBuilder.lines;
 
                 if (missingLines > 0)
                 {
                     foreach (int i in Enumerable.Range(0, missingLines))
                     {
-                        interfaceBuffer.AppendLine(InterfaceHelpers.ClearLine(ConsoleWidth));
+                        interfaceBuffer.AppendLine(_helper.ClearLine(ConsoleWidth));
                     }
                 }
 
@@ -253,16 +263,16 @@ public abstract class ConsoleUI
                 interfaceBuffer.Append(bodyBuilder.Build());
 
                 // Add separator
-                interfaceBuffer.AppendLine(InterfaceHelpers.SeparateLine(ConsoleWidth, ScrolledRight, ScrolledLeft, ScrolledUp));
+                interfaceBuffer.AppendLine(_helper.SeparateLine(ConsoleWidth, ScrolledRight, ScrolledLeft, ScrolledUp));
 
                 // Add current user input
                 if (inputBuffer.Length <= ConsoleWidth)
                 {
-                    interfaceBuffer.Append(InterfaceHelpers.EncapsulateAndPadRight(inputBuffer, ConsoleWidth));
+                    interfaceBuffer.Append(InterfaceHelpers.EncapsulatePadNoSender(inputBuffer, ConsoleWidth));
                 }
                 else
                 {
-                    interfaceBuffer.Append(InterfaceHelpers.Encapsulate(inputBuffer.Substring(windowOffset, ConsoleWidth)));
+                    interfaceBuffer.Append(InterfaceHelpers.EncapsulatePadNoSender(inputBuffer.Substring(windowOffset, ConsoleWidth), ConsoleWidth));
                 }
 
                 // Add bottom line
@@ -278,7 +288,7 @@ public abstract class ConsoleUI
     {
         lock (messageLock)
         {
-            messages.Add(new Message(body, sender));
+            messages.Add(new Message(body, String.IsNullOrEmpty(sender) ? "" : sender));
 
             if (messageOffset != 0)
             {
