@@ -18,6 +18,7 @@ public abstract class ConsoleUI
     private string inputBuffer = "";
     private int cursorPosition = 0;
     private int windowOffset = 0;
+    private int messageOffset = 0;
 
     readonly object drawLock = new();
     readonly object messageLock = new();
@@ -39,6 +40,14 @@ public abstract class ConsoleUI
     }
 
     public abstract void UserInputHandler(string input);
+
+    public abstract void ExitHandler();
+
+    public void Stop()
+    {
+        GotoMainBuffer();
+        exit = true;
+    }
 
     private void ReadWorker()
     {
@@ -109,6 +118,49 @@ public abstract class ConsoleUI
                     cursorPosition++;
                 }
                 break;
+            case ConsoleKey.UpArrow:
+                if (messageOffset == messages.Count - 1)
+                {
+                    Console.Beep();
+                }
+                else
+                {
+                    messageOffset++;
+                }
+                break;
+            case ConsoleKey.DownArrow:
+                if (messageOffset == 0)
+                {
+                    Console.Beep();
+                }
+                else
+                {
+                    messageOffset--;
+                }
+                break;
+            case ConsoleKey.PageUp:
+                if (messageOffset == messages.Count - 1)
+                {
+                    Console.Beep();
+                }
+                else
+                {
+                    messageOffset = Math.Min(messages.Count - 1, messageOffset + 10);
+                }
+                break;
+            case ConsoleKey.PageDown:
+                if (messageOffset == 0)
+                {
+                    Console.Beep();
+                }
+                else
+                {
+                    messageOffset = Math.Max(0, messageOffset - 10);
+                }
+                break;
+            case ConsoleKey.Home:
+                messageOffset = 0;
+                break;
             case ConsoleKey.Backspace:
                 if (cursorPosition + windowOffset == 0)
                 {
@@ -141,8 +193,7 @@ public abstract class ConsoleUI
                 }
                 break;
             case ConsoleKey.Escape:
-                GotoMainBuffer();
-                exit = true;
+                Stop();
 
                 return;
         }
@@ -161,7 +212,7 @@ public abstract class ConsoleUI
             lock (messageLock)
             {
                 // Keep adding messages until we run out or the screen is filled
-                for (int i = messages.Count; i > 0; i--)
+                for (int i = messages.Count - messageOffset; i > 0; i--)
                 {
                     bodyBuilder.AppendMessage(messages[i - 1]);
 
@@ -218,6 +269,11 @@ public abstract class ConsoleUI
         {
             messages.Add(message);
             senders.Add(sender);
+
+            if (messageOffset != 0)
+            {
+                messageOffset++;
+            }
         }
 
         DrawInterface();
