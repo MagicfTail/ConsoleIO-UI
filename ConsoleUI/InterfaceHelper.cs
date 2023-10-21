@@ -18,8 +18,11 @@ public class InterfaceHelpers
     private const char wavySeparator = '╍';
     private const char RightArrow = '⮞';
     private const char LeftArrow = '⮜';
+
     public const string MainBufferString = "\x1b[?1049l";
     public const string AltBufferString = "\x1b[?1049h";
+    public const string SteadyBarString = "\x1b[6 q";
+    public const string DefaultCursorString = "\x1b[0 q";
 
     private readonly int _senderWidth;
 

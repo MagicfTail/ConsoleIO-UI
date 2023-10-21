@@ -225,8 +225,6 @@ public abstract class ConsoleUI
             RefreshConsoleSize();
             lock (drawLock)
             {
-                Console.SetCursorPosition(0, 0);
-
                 MessagesBodyBuilder bodyBuilder = new(UsableWidth, UsableHeight, _helper);
 
                 lock (messageLock)
@@ -278,6 +276,7 @@ public abstract class ConsoleUI
                 // Add bottom line
                 interfaceBuffer.Append(InterfaceHelpers.BottomLine(ConsoleWidth));
 
+                Console.SetCursorPosition(0, 0);
                 Console.Write(interfaceBuffer);
                 Console.SetCursorPosition(cursorPosition + 1, ConsoleHeight);
             }
@@ -331,6 +330,7 @@ public abstract class ConsoleUI
     private static void GotoMainBuffer()
     {
         Console.Clear();
+        Console.Write(InterfaceHelpers.DefaultCursorString);
         Console.Write(InterfaceHelpers.MainBufferString);
     }
 
@@ -338,5 +338,6 @@ public abstract class ConsoleUI
     {
         Console.Write(InterfaceHelpers.AltBufferString);
         Console.Clear();
+        Console.Write(InterfaceHelpers.SteadyBarString);
     }
 }
