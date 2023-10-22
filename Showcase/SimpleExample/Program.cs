@@ -1,4 +1,6 @@
-﻿class Example
+﻿using ConsoleUI;
+
+class Example
 {
     static void Main()
     {
@@ -10,7 +12,7 @@
         program.thread.Join();
     }
 
-    private class Program : ConsoleUI.ConsoleUI
+    private class Program : ConsoleInterface
     {
         bool exitSignal = false;
 

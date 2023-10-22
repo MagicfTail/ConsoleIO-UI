@@ -2,7 +2,7 @@ using System.Text;
 
 namespace ConsoleUI;
 
-public abstract class ConsoleUI
+public abstract class ConsoleInterface
 {
     private readonly List<Message> messages = new();
 
@@ -32,7 +32,7 @@ public abstract class ConsoleUI
     private bool ScrolledLeft => windowOffset + ConsoleWidth < inputBuffer.Length;
     private bool ScrolledUp => messageOffset > 0;
 
-    public ConsoleUI(int senderWidth = 0)
+    public ConsoleInterface(int senderWidth = 0)
     {
         _senderWidth = senderWidth > 0 ? senderWidth : 0;
         _helper = new(SenderAreaWidth);

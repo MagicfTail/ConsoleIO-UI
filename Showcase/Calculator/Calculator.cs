@@ -1,4 +1,6 @@
-﻿class Program
+﻿using ConsoleUI;
+
+class Program
 {
     static void Main()
     {
@@ -7,7 +9,7 @@
         calculator.Start();
     }
 
-    private class Calculator : ConsoleUI.ConsoleUI
+    private class Calculator : ConsoleInterface
     {
         private readonly Tokenizer.Tokenizer tokenizer;
         public Calculator() : base()
@@ -32,6 +34,8 @@
                 AddMessage($"{input} = Division By Zero", null);
             }
         }
+
+        public override void ExitHandler() { }
     }
 }
 
