@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace ConsoleUI;
+namespace ConsoleIOUI;
 
 public class InterfaceHelpers
 {

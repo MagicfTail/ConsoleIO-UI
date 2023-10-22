@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\ConsoleUI\ConsoleUI.csproj" />
+    <ProjectReference Include="..\..\ConsoleIOUI\ConsoleIOUI.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

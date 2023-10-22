@@ -1,4 +1,4 @@
-namespace ConsoleUI;
+namespace ConsoleIOUI;
 
 public class Message
 {
