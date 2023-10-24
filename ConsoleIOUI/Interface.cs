@@ -13,6 +13,8 @@ public abstract class ConsoleInterface
     private readonly InterfaceHelpers _helper;
     private readonly int _senderWidth;
 
+    private Thread? readerThread;
+
     private int fullWidth = Console.BufferWidth;
     private int fullHeight = Console.BufferHeight;
     private int ConsoleWidth => fullWidth - 2;
@@ -45,7 +47,10 @@ public abstract class ConsoleInterface
     public void Start()
     {
         Console.OutputEncoding = Encoding.UTF8;
-        Thread readerThread = new(ReadWorker);
+        readerThread = new(ReadWorker)
+        {
+            IsBackground = true
+        };
 
         GotoAlternateBuffer();
         DrawInterface();
@@ -59,6 +64,7 @@ public abstract class ConsoleInterface
     {
         GotoMainBuffer();
         exit = true;
+        readerThread?.Interrupt();
         ExitHandler();
     }
 
@@ -68,7 +74,14 @@ public abstract class ConsoleInterface
         {
             try
             {
-                KeyHandler(Console.ReadKey(true));
+                if (Console.KeyAvailable)
+                {
+                    KeyHandler(Console.ReadKey(true));
+                }
+                else
+                {
+                    Thread.Sleep(2);
+                }
             }
             finally
             { }

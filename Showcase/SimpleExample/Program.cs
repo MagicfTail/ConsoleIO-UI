@@ -8,8 +8,6 @@ class Example
         program.thread.Start();
 
         program.Start();
-
-        program.thread.Join();
     }
 
     private class Program : ConsoleInterface
@@ -25,6 +23,11 @@ class Example
                 int i = 1;
                 while (!exitSignal)
                 {
+                    if (i == 5)
+                    {
+                        Stop();
+                        return;
+                    }
                     AddMessage($"Message {i}", "Important Process");
                     i++;
                     Thread.Sleep(1000);
