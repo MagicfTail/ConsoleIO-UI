@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.0.3"></a>
+## [1.0.3](https://www.github.com/MagicfTail/ConsoleIOUI/releases/tag/v1.0.3) (2023-10-27)
+
+### Bug Fixes
+
+* Catch stopping the reader thread ([5f555b4](https://www.github.com/MagicfTail/ConsoleIOUI/commit/5f555b4ede35b51c05ead3451f39df62e5a8eabf))
+
 <a name="1.0.2"></a>
 ## [1.0.2](https://www.github.com/MagicfTail/ConsoleIOUI/releases/tag/v1.0.2) (2023-10-26)
 

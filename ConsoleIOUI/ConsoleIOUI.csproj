@@ -8,7 +8,7 @@
     <Authors>Magic fTail</Authors>
     <PackageProjectUrl>https://github.com/MagicfTail/ConsoleIOUI</PackageProjectUrl>
     <PackageTags>library, console, IO, UI, user interface, terminal</PackageTags>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
   </PropertyGroup>
 
   <ItemGroup>
