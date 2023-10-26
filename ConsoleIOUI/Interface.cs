@@ -61,10 +61,7 @@ public abstract class ConsoleInterface
         EntranceHandler();
 
         Console.OutputEncoding = Encoding.UTF8;
-        readerThread = new(ReadWorker)
-        {
-            IsBackground = true
-        };
+        readerThread = new(ReadWorker);
 
         GotoAlternateBuffer();
         DrawInterface();
@@ -72,14 +69,16 @@ public abstract class ConsoleInterface
         readerThread.Start();
 
         readerThread.Join();
+
+        GotoMainBuffer();
+
+        ExitHandler();
     }
 
     public void Stop()
     {
-        GotoMainBuffer();
-        exit = true;
         readerThread?.Interrupt();
-        ExitHandler();
+        exit = true;
     }
 
     private void ReadWorker()
@@ -97,8 +96,10 @@ public abstract class ConsoleInterface
                     Thread.Sleep(2);
                 }
             }
-            finally
-            { }
+            catch (ThreadInterruptedException)
+            {
+                exit = true;
+            }
         }
     }
 
@@ -354,17 +355,23 @@ public abstract class ConsoleInterface
         windowOffset = 0;
     }
 
-    private static void GotoMainBuffer()
+    private void GotoMainBuffer()
     {
-        Console.Clear();
-        Console.Write(InterfaceHelpers.DefaultCursorString);
-        Console.Write(InterfaceHelpers.MainBufferString);
+        lock (drawLock)
+        {
+            Console.Clear();
+            Console.Write(InterfaceHelpers.DefaultCursorString);
+            Console.Write(InterfaceHelpers.MainBufferString);
+        }
     }
 
-    private static void GotoAlternateBuffer()
+    private void GotoAlternateBuffer()
     {
-        Console.Write(InterfaceHelpers.AltBufferString);
-        Console.Clear();
-        Console.Write(InterfaceHelpers.SteadyBarString);
+        lock (drawLock)
+        {
+            Console.Write(InterfaceHelpers.AltBufferString);
+            Console.Clear();
+            Console.Write(InterfaceHelpers.SteadyBarString);
+        }
     }
 }
