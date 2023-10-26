@@ -40,12 +40,26 @@ public abstract class ConsoleInterface
         _helper = new(SenderAreaWidth);
     }
 
+    /// <summary>
+    /// Called when the user presses enter
+    /// </summary>
+    /// <param name="input">The typed message</param>
     public abstract void UserInputHandler(string input);
 
+    /// <summary>
+    /// Called before the interface starts
+    /// </summary>
+    public abstract void EntranceHandler();
+
+    /// <summary>
+    /// Called after the interface exits
+    /// </summary>
     public abstract void ExitHandler();
 
     public void Start()
     {
+        EntranceHandler();
+
         Console.OutputEncoding = Encoding.UTF8;
         readerThread = new(ReadWorker)
         {

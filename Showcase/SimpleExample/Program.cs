@@ -5,7 +5,6 @@ class Example
     static void Main()
     {
         Program program = new(15);
-        program.thread.Start();
 
         program.Start();
     }
@@ -40,9 +39,15 @@ class Example
             AddMessage(input, "Me :)");
         }
 
+        public override void EntranceHandler()
+        {
+            thread.Start();
+        }
+
         public override void ExitHandler()
         {
             exitSignal = true;
+            Console.WriteLine("Program exited");
         }
     }
 }

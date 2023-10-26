@@ -35,6 +35,8 @@ class Program
             }
         }
 
+        public override void EntranceHandler() { }
+
         public override void ExitHandler() { }
     }
 }
